@@ -488,7 +488,7 @@
             // text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<p>";
             // text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<p>";
             // arrow.innerHTML = text;
-            hd.style.transform = 'translate('+_w*(Math.round(event.alpha)-90)+'px, '+_h*(Math.round(event.beta)-90)+'px)';
+            hd.style.transform = 'translate('+_w*(Math.round(event.alpha)-90)/180+'px, '+_h*(Math.round(event.beta)-90)/180+'px)';
         }
     }
     catch (e) {
