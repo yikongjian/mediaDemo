@@ -407,7 +407,12 @@ navigator.mediaDevices.enumerateDevices()
 
 
 			// var constraints = {audio: false , video: { facingMode: { exact: "environment" } } };// "user"、"environment"
-			var constraints = {audio: false , video: 'optional': [{  'sourceId': _sourceId }]   };// "user"、"environment"
+			var constraints = {
+				audio: false ,
+				video: {
+					'optional': [{  'sourceId': _sourceId }]  
+				} 
+			};// "user"、"environment"
 
 			navigator.mediaDevices.getUserMedia(constraints)
 			.then(function(stream) {
