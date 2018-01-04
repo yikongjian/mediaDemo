@@ -294,7 +294,9 @@
   </div>
 
 </section>
-
+<div id="ct" style="position: absolute; top: 0; left: 0;z-index: 200;">
+	
+</div>
     <script type="text/javascript">
         var video = document.querySelector('video');  
         var audio, audioType;  
@@ -381,8 +383,31 @@
 //     });
 //   }
 // }
+
         function getMedia() { 
-			var constraints = {audio: false , video: { facingMode: { exact: "environment" } } };// "user"、"environment"
+// document.getElementById('ct').innerHTML = navigator.mediaDevices.enumerateDevices()["[[PromiseValue]]"];
+// var p = navigator.mediaDevices.enumerateDevices();
+var p = navigator.mediaDevices;
+// var html = '';
+var _sourceId = '';
+// console.log(p.enumerateDevices());
+navigator.mediaDevices.enumerateDevices()
+.then(function(MediaDeviceInfo) { 
+	for (var k = 0, length = MediaDeviceInfo.length; k < length; k++) {
+		// console.log(MediaDeviceInfo[k]);
+		// html = '<p>'+html + MediaDeviceInfo[k].label+'=>'+ MediaDeviceInfo[k].kind+'</p>';
+		if (MediaDeviceInfo[k].kind == 'videoinput') {
+			_sourceId = MediaDeviceInfo[k].deviceId;
+		}
+	}
+// document.getElementById('ct').innerHTML = html;
+// console.log(html);
+
+	
+
+
+			// var constraints = {audio: false , video: { facingMode: { exact: "environment" } } };// "user"、"environment"
+			var constraints = {audio: false , video: 'optional': [{  'sourceId': _sourceId }]   };// "user"、"environment"
 
 			navigator.mediaDevices.getUserMedia(constraints)
 			.then(function(stream) {
@@ -401,6 +426,9 @@
 			.catch(function(err) {
 			  console.log(err.name + ": " + err.message);
 			});
+
+
+		})
         }  
   
         function successFunc(stream) {  
