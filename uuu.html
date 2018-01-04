@@ -337,7 +337,11 @@
         function getMedia() {  
             if (navigator.getUserMedia) {  
                 navigator.getUserMedia({  
-                    'video':{ 'facingMode': { exact: 'environment' } },//调用前置摄像头，后置摄像头使用video: { facingMode: { exact: "environment" } }
+                    'video':{
+                        'facingMode': {
+                            'exact': 'environment'
+                        }
+                    },//调用前置摄像头，后置摄像头使用video: { facingMode: { exact: "environment" } }
                     'audio':false  
                 }, successFunc, errorFunc);    //success是获取成功的回调函数  
             }  
