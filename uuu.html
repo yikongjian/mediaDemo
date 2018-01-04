@@ -481,13 +481,14 @@
         // var text = "";
         window.addEventListener("deviceorientation", orientationHandler, false);
         function orientationHandler(event) {
+
             // text = ""
             // var arrow = document.getElementById("arrow");
             // text += "左右旋转：rotate alpha{" + Math.round(event.alpha) + "deg)<p>";
             // text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<p>";
             // text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<p>";
             // arrow.innerHTML = text;
-            hd.style.transform = 'translate('+_w*(event.alpha-90)+'px, '+_h*(event.beta-90)+'px)';
+            hd.style.transform = 'translate('+_w*(Math.round(event.alpha)-90)+'px, '+_h*(Math.round(event.beta)-90)+'px)';
         }
     }
     catch (e) {
