@@ -382,7 +382,7 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
   }
 }
         function getMedia() { 
-			var constraints = {audio: false , video: { facingMode: "user" } };// "user"、"environment"
+			var constraints = {audio: false , video: { facingMode: "environment" } };// "user"、"environment"
 
 			navigator.mediaDevices.getUserMedia(constraints)
 			.then(function(stream) {
