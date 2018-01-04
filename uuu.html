@@ -18,7 +18,7 @@
         transform: scale3d(.6, .6, .6) rotate3d(0, 0, 0, 90deg);
     }
 </style>
-<body onload="getMedia(1);" style="width: 100vw; height: 100vh; overflow: hidden; padding: 0;margin: 0; position: relative;">  
+<body onload="getMedia(0);" style="width: 100vw; height: 100vh; overflow: hidden; padding: 0;margin: 0; position: relative;">  
     <!-- <input type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia();" /><br />   -->
     <video style="min-width: 100vw; min-height: 100vh; position: absolute; top: 50%; left: 50%; z-index: 10; margin: -50vh 0 0 -50vw;" autoplay="autoplay"></video>
     <!-- <hr />   -->
@@ -305,51 +305,82 @@
         // var canvas2 = document.getElementById('canvas2');  
         // var context2 = canvas2.getContext('2d');  
   
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices.getUserMedia;  
+        navigator.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;  
         window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;  
         // console.log(this);
         var exArray = []; //存储设备源ID  
-        MediaStreamTrack.getSources(function (sourceInfos) {  
-            for (var i = 0; i != sourceInfos.length; ++i) {  
-                var sourceInfo = sourceInfos[i];  
-                //这里会遍历audio,video，所以要加以区分  
-                if (sourceInfo.kind === 'video') {  
-                    exArray.push(sourceInfo.id);  
-                }  
-            }  
-        });  
+        // MediaStreamTrack.getSources(function (sourceInfos) {  
+        //     for (var i = 0; i != sourceInfos.length; ++i) {  
+        //         var sourceInfo = sourceInfos[i];  
+        //         //这里会遍历audio,video，所以要加以区分  
+        //         if (sourceInfo.kind === 'video') {  
+        //             exArray.push(sourceInfo.id);  
+        //         }  
+        //     }  
+        // });  
   
-        function getMedia(a) {  
-            if (navigator.getUserMedia) {  
-                navigator.getUserMedia({  
-                    'video': {  
-                        'optional': [{  
-                            'sourceId': exArray[a] //0为前置摄像头，1为后置  
-                        }]  
-                    },  
-                    'audio':false  
-                }, successFunc, errorFunc);    //success是获取成功的回调函数  
-            }  
-            else {  
-                alert('Native device media streaming (getUserMedia) not supported in this browser.');  
-            }  
-        }  
-console.log(navigator)
-        // function getMedia() {  
+        // function getMedia(a) {  
         //     if (navigator.getUserMedia) {  
         //         navigator.getUserMedia({  
-        //             'video':{
-        //                 facingMode: {
-        //                     exact: 'environment',
-        //                 },
-        //             },//调用前置摄像头，后置摄像头使用video: { facingMode: { exact: "environment" } }
+        //             'video': {  
+        //                 'optional': [{  
+        //                     'sourceId': exArray[a] //0为前置摄像头，1为后置  
+        //                 }]  
+        //             },  
         //             'audio':false  
         //         }, successFunc, errorFunc);    //success是获取成功的回调函数  
         //     }  
         //     else {  
         //         alert('Native device media streaming (getUserMedia) not supported in this browser.');  
         //     }  
-        // }  
+        // }
+        function getMedia() {  
+			// Older browsers might not implement mediaDevices at all, so we set an empty object first
+			if (navigator.mediaDevices === undefined) {
+			  navigator.mediaDevices = {};
+			}
+
+			// Some browsers partially implement mediaDevices. We can't just assign an object
+			// with getUserMedia as it would overwrite existing properties.
+			// Here, we will just add the getUserMedia property if it's missing.
+			if (navigator.mediaDevices.getUserMedia === undefined) {
+			  navigator.mediaDevices.getUserMedia = function(constraints) {
+
+			    // First get ahold of the legacy getUserMedia, if present
+			    var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+			    // Some browsers just don't implement it - return a rejected promise with an error
+			    // to keep a consistent interface
+			    if (!getUserMedia) {
+			      return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+			    }
+
+			    // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+			    return new Promise(function(resolve, reject) {
+			      getUserMedia.call(navigator, constraints, resolve, reject);
+			    });
+			  }
+			}
+			var constraints = {audio: false , video: { facingMode: "environment" } };// "user"、"environment"
+
+			navigator.mediaDevices.getUserMedia(constraints)
+			.then(function(stream) {
+			  // var video = document.querySelector('video');
+			  // Older browsers may not have srcObject
+			  if ("srcObject" in video) {
+			    video.srcObject = stream;
+			  } else {
+			    // Avoid using this in new browsers, as it is going away.
+			    video.src = window.URL.createObjectURL(stream);
+			  }
+			  video.onloadedmetadata = function(e) {
+			    video.play();
+			  };
+			})
+			.catch(function(err) {
+			  console.log(err.name + ": " + err.message);
+			});
+        }  
   
         function successFunc(stream) {  
             //alert('Succeed to get media!');  
