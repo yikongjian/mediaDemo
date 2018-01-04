@@ -18,7 +18,7 @@
         transform: scale3d(.6, .6, .6) rotate3d(0, 0, 0, 90deg);
     }
 </style>
-<body onload="getMedia();" style="width: 100vw; height: 100vh; overflow: hidden; padding: 0;margin: 0; position: relative;">  
+<body onload="getMedia(1);" style="width: 100vw; height: 100vh; overflow: hidden; padding: 0;margin: 0; position: relative;">  
     <!-- <input type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia();" /><br />   -->
     <video style="min-width: 100vw; min-height: 100vh; position: absolute; top: 50%; left: 50%; z-index: 10; margin: -50vh 0 0 -50vw;" autoplay="autoplay"></video>
     <!-- <hr />   -->
@@ -319,12 +319,12 @@
         //     }  
         // });  
   
-        function getMedia() {  
+        function getMedia(a) {  
             if (navigator.getUserMedia) {  
                 navigator.getUserMedia({  
                     'video': {  
                         'optional': [{  
-                            'sourceId': exArray[1] //0为前置摄像头，1为后置  
+                            'sourceId': exArray[a] //0为前置摄像头，1为后置  
                         }]  
                     },  
                     'audio':true  
