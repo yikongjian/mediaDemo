@@ -8,14 +8,14 @@
 </head>  
 <style>
     #hd{
-        width: 200px;
+/*        width: 200px;
         height: 200px;
         position: absolute;
         top: 50%;
         left: 50%;
         z-index: 100;
         margin: -100px 0 0 -100px;
-        transform: scale3d(.6, .6, .6) rotate3d(0, 0, 0, 90deg);
+        transform: scale3d(.6, .6, .6) rotate3d(0, 0, 0, 90deg);*/
     }
 </style>
 <body onload="getMedia();" style="width: 100vw; height: 100vh; overflow: hidden; padding: 0;margin: 0; position: relative;">  
@@ -62,7 +62,7 @@
 
   </defs>
 </svg>
-<section class="scene3d">
+<section class="scene3d" id="hd">
 
   <div class="butterfly_container">
     <var class="rotate3d">
@@ -473,5 +473,25 @@
   //   }
   //   console.log(hd.src)
   // }, 100);
+	var hd = document.getElementById('hd');
+	var _w = document.body.clientWidth;
+	var _h = document.body.clientHeight;
+	// console.log(_w);
+    try {
+        // var text = "";
+        window.addEventListener("deviceorientation", orientationHandler, false);
+        function orientationHandler(event) {
+            // text = ""
+            // var arrow = document.getElementById("arrow");
+            // text += "左右旋转：rotate alpha{" + Math.round(event.alpha) + "deg)<p>";
+            // text += "前后旋转：rotate beta{" + Math.round(event.beta) + "deg)<p>";
+            // text += "扭转设备：rotate gamma{" + Math.round(event.gamma) + "deg)<p>";
+            // arrow.innerHTML = text;
+            hd.style.transform = 'translate('+_w*(event.alpha-90)+'px, '+_h*(event.beta-90)+'px)';
+        }
+    }
+    catch (e) {
+        // $("#arrow").html(e.message)
+    }
     </script>  
 </body>  
