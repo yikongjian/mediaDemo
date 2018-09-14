@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+  <head>
+        <meta charset="UTF-8">
+    <title>咖啡厅</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; height: 45px;}
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; margin-bottom: 45px;}
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <div style="display: flex;justify-content: space-between;">
+      <video id="video" width="960" height="640"></video>
+      <canvas id="canvas" width="960" height="640"></canvas>
+    </div>
+    <div style="display: flex;justify-content: space-between;margin-top: 20px;">
+      <div style="width: 100%; text-align: right;"><button id="capture" style="width: 80px; height: 30px;margin-right: 20px;background: #0ff;">提交</button></div>
+      <div style="width: 100%;"><code id="code"></code></div>
+    </div>
+  </body>
+  <!-- <script src="./jquery-3.1.1.min.js"></script> -->
+  <!-- <script src="./socket.io.js"></script> -->
+  <script>
+
+  function send() {
+    document.getElementById('code').innerHTML = '稍等！后台运算中……';
+    var _data = {
+
+    }
+    var base64 = getBase64Image();  
+    // console.log(base64);
+    ajaxPost(
+      // 'http://114.115.165.111:20004/v1/image/gestureDetection',
+      // 'http://192.168.199.193:7000/gestureDetection',
+      'http://139.199.70.90:7005/gestureDetection',
+      _data = {
+        image: base64,
+        threshold: 0.50
+      },
+      function(res){
+        console.log('成功');
+        console.log(res);
+        var su = ''
+        if (res.indexOf('Success.') >= 0) {
+          su = '识别成功!<br>'
+        } else {
+          su = '识别失败!<br>'
+        }
+        document.getElementById('code').innerHTML = su + res;
+      },
+      function(err){
+        console.log('失败');
+        console.log(err);
+      },
+      function(res){
+        console.log('进行中');
+        console.log(res);
+      }
+    )
+  }
+
+// ajax 对象
+function ajaxObject() {
+    var xmlHttp;
+    try {
+        // Firefox, Opera 8.0+, Safari
+        xmlHttp = new XMLHttpRequest();
+        } 
+    catch (e) {
+        // Internet Explorer
+        try {
+                xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+            try {
+                xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (e) {
+                alert("您的浏览器不支持AJAX！");
+                return false;
+            }
+        }
+    }
+    return xmlHttp;
+}
+ 
+// ajax post请求：
+function ajaxPost ( url , data , fnSucceed , fnFail , fnLoading ) {
+    var ajax = ajaxObject();
+    ajax.open( "post" , url , true );
+    // ajax.setRequestHeader( "Content-Type" , "application/x-www-form-urlencoded" );
+    ajax.setRequestHeader( "Content-Type" , "application/json" );
+    ajax.onreadystatechange = function () {
+        if( ajax.readyState == 4 ) {
+            if( ajax.status == 200 ) {
+                fnSucceed( ajax.responseText );
+            }
+            else {
+                fnFail( "HTTP请求错误！错误码："+ajax.status );
+            }
+        }
+        else {
+            fnLoading();
+        }
+    }
+    // console.log(JSON.stringify(JSON.stringify(data)));
+    ajax.send(JSON.stringify(data));
+    // ajax.send( data );
+ 
+}
+
+function getBase64Image() {   
+     var dataURL = canvas.toDataURL("image/jpeg");
+     var reg = new RegExp("data:image/jpeg;base64,","g");
+     dataURL = dataURL.replace(reg, "");
+     return dataURL;  
+} 
+
+
+
+    //访问用户媒体设备的兼容方法
+    function getUserMedia(constraints, success, error) {
+      if (navigator.mediaDevices.getUserMedia) {
+        //最新的标准API
+        navigator.mediaDevices.getUserMedia(constraints).then(success).catch(error);
+      } else if (navigator.webkitGetUserMedia) {
+        //webkit核心浏览器
+        navigator.webkitGetUserMedia(constraints,success, error)
+      } else if (navigator.mozGetUserMedia) {
+        //firfox浏览器
+        navigator.mozGetUserMedia(constraints, success, error);
+      } else if (navigator.getUserMedia) {
+        //旧版API
+        navigator.getUserMedia(constraints, success, error);
+      }
+    }
+
+    let video = document.getElementById('video');
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+
+    function success(stream) {
+      //兼容webkit核心浏览器
+      let CompatibleURL = window.URL || window.webkitURL;
+      //将视频流设置为video元素的源
+      // console.log(stream);
+
+      //video.src = CompatibleURL.createObjectURL(stream);
+      video.srcObject = stream;
+      video.play();
+    }
+
+    function error(error) {
+      console.log(`访问用户媒体设备失败${error.name}, ${error.message}`);
+    }
+
+    if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
+      //调用用户媒体设备, 访问摄像头
+      getUserMedia({video : {width: 960, height: 640}}, success, error);
+    } else {
+      alert('不支持访问用户媒体');
+    }
+
+    document.getElementById('capture').addEventListener('click', function () {
+      setTimeout(function(){
+        context.drawImage(video, 0, 0, 960, 640);
+        send()
+      }, 5000)
+    })
+
+  </script>
+</html>
