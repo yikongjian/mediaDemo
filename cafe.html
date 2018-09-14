@@ -3,6 +3,7 @@
   <head>
         <meta charset="UTF-8">
     <title>咖啡厅</title>
+    <script src="./eruda.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -27,7 +28,7 @@
   <!-- <script src="./jquery-3.1.1.min.js"></script> -->
   <!-- <script src="./socket.io.js"></script> -->
   <script>
-
+  eruda.init();
   function send() {
     document.getElementById('code').innerHTML = '稍等！后台运算中……';
     var _data = {
@@ -173,5 +174,5 @@ function getBase64Image() {
     })
 
   </script>
-  <script src="./eruda.js"></script>
+  
 </html>
